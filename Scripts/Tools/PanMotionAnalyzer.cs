@@ -55,7 +55,26 @@ public class PanMotionAnalyzer : MonoBehaviour
         }
     }
 
+    public PanContents Contents
+    {
+        get => contents;
+        set => contents = value;
+    }
+
+    public Rigidbody PanBody
+    {
+        get => panBody;
+        set => panBody = value;
+    }
+
+    public float ShakeThreshold => shakeThreshold;
+
     private void Update()
+    {
+        Tick(Time.deltaTime);
+    }
+
+    public void Tick(float deltaTime)
     {
         if (contents == null || panBody == null)
         {
@@ -72,7 +91,7 @@ public class PanMotionAnalyzer : MonoBehaviour
         bool currentlyShaking = angularSpeed >= shakeThreshold;
         if (currentlyShaking)
         {
-            sedimentRemovalAccumulator += sedimentRemovalRate * Time.deltaTime;
+            sedimentRemovalAccumulator += sedimentRemovalRate * deltaTime;
             int particlesToRemove = Mathf.FloorToInt(sedimentRemovalAccumulator);
             if (particlesToRemove > 0)
             {
@@ -82,7 +101,7 @@ public class PanMotionAnalyzer : MonoBehaviour
         }
         else
         {
-            sedimentRemovalAccumulator = Mathf.Max(0f, sedimentRemovalAccumulator - Time.deltaTime);
+            sedimentRemovalAccumulator = Mathf.Max(0f, sedimentRemovalAccumulator - deltaTime);
         }
 
         bool rinseReady = contents.CurrentWaterVolume >= rinseWaterVolumeThreshold &&
@@ -90,7 +109,7 @@ public class PanMotionAnalyzer : MonoBehaviour
 
         if (rinseReady)
         {
-            goldRemovalAccumulator += goldReleaseRate * Time.deltaTime;
+            goldRemovalAccumulator += goldReleaseRate * deltaTime;
             int goldToRemove = Mathf.FloorToInt(goldRemovalAccumulator);
             if (goldToRemove > 0)
             {
